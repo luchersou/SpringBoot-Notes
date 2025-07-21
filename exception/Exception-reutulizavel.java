@@ -66,6 +66,16 @@ public class TratadorDeErros {
                 ));
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<DadosErroResposta> tratarMetodoNaoPermitido(HttpRequestMethodNotSupportedException ex) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(new DadosErroResposta(
+                        LocalDateTime.now(),
+                        HttpStatus.METHOD_NOT_ALLOWED.value(),
+                        "Método HTTP não permitido para este recurso. Métodos suportados: " + ex.getSupportedHttpMethods()
+                ));
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<DadosErroResposta> tratarErroBadCredentials() {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
