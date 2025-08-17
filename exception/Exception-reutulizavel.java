@@ -1,26 +1,27 @@
+import com.edutech.api.domain.exception.ValidacaoException;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.AuthenticationException;
 
-import jakarta.persistence.EntityNotFoundException;
-
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestControllerAdvice
-public class TratadorDeErros {
+public class TratarErros {
 
-    private static final Logger logger = LoggerFactory.getLogger(TratadorDeErros.class);
+    private static final Logger logger = LoggerFactory.getLogger(TratarErros.class);
 
     @ExceptionHandler(ValidacaoException.class)
     public ResponseEntity<DadosErroResposta> tratarErroRegraDeNegocio(ValidacaoException ex) {
@@ -117,8 +118,9 @@ public class TratadorDeErros {
                 ));
     }
 
-    // DTO padronizado para erros simples e complexos
+
     private record DadosErroResposta(
+            @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
             LocalDateTime timestamp,
             int status,
             String mensagem,
@@ -129,10 +131,10 @@ public class TratadorDeErros {
         }
     }
 
-    // DTO para erros de validação de campos
     private record DadosErroValidacao(String campo, String mensagem) {
         public DadosErroValidacao(FieldError erro) {
             this(erro.getField(), erro.getDefaultMessage());
         }
     }
+
 }
